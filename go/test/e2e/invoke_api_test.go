@@ -35,7 +35,7 @@ func setupMockServer(t *testing.T, mockFile string) (string, func()) {
 	require.NoError(t, err)
 
 	server := mockllm.NewServer(mockllmCfg)
-	baseURL, err := server.Start()
+	baseURL, err := server.Start(t.Context())
 	baseURL = buildK8sURL(baseURL)
 	require.NoError(t, err)
 

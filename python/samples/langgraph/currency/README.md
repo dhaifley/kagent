@@ -31,6 +31,7 @@ docker push localhost:5001/langgraph-currency:latest
 ```bash
 kubectl create secret generic kagent-google -n kagent \
   --from-literal=GOOGLE_API_KEY=$GOOGLE_API_KEY \
+  --from-literal=GOOGLE_API_BASE=$GOOGLE_API_BASE \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
@@ -83,6 +84,7 @@ The agent maintains conversation history across sessions using the KAgent REST A
 The agent can be configured via environment variables:
 
 - `GOOGLE_API_KEY`: Required for Gemini API access
+- `GOOGLE_API_BASE`: Optional, use alternative LLM endpoint
 - `KAGENT_URL`: KAgent server URL (default: http://localhost:8080)
 - `PORT`: Server port (default: 8080)
 - `HOST`: Server host (default: 0.0.0.0)

@@ -1,5 +1,5 @@
 import logging
-
+import os
 import httpx
 from kagent.core import KAgentConfig
 from kagent.langgraph import KAgentCheckpointer
@@ -65,8 +65,19 @@ FORMAT_INSTRUCTION = (
     "Set response status to completed if the request is complete."
 )
 
+clientOpts = (
+    {"api_endpoint": api_base}
+    if (api_base := os.getenv("GOOGLE_API_BASE"))
+    else None
+)
+
+print ("Using client options:", clientOpts)
+
 graph = create_react_agent(
-    model=ChatGoogleGenerativeAI(model="gemini-2.0-flash"),
+    model=ChatGoogleGenerativeAI(
+        model="gemini-2.0-flash",
+        client_options=clientOpts,
+    ),
     tools=[get_exchange_rate],
     checkpointer=kagent_checkpointer,
     prompt=SYSTEM_INSTRUCTION,
