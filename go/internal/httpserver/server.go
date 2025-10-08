@@ -145,6 +145,12 @@ func (s *HTTPServer) setupRoutes() {
 		handlers.RespondWithJSON(erw, http.StatusOK, versionResponse)
 	})).Methods(http.MethodGet)
 
+	// Use middleware for common functionality
+	s.router.Use(auth.AuthnMiddleware(s.authenticator))
+	s.router.Use(contentTypeMiddleware)
+	s.router.Use(loggingMiddleware)
+	s.router.Use(errorHandlerMiddleware)
+
 	// Model configs
 	s.router.HandleFunc(APIPathModelConfig, adaptHandler(s.handlers.ModelConfig.HandleListModelConfigs)).Methods(http.MethodGet)
 	s.router.HandleFunc(APIPathModelConfig+"/{namespace}/{name}", adaptHandler(s.handlers.ModelConfig.HandleGetModelConfig)).Methods(http.MethodGet)
@@ -212,11 +218,6 @@ func (s *HTTPServer) setupRoutes() {
 	// A2A
 	s.router.PathPrefix(APIPathA2A + "/{namespace}/{name}").Handler(s.config.A2AHandler)
 
-	// Use middleware for common functionality
-	s.router.Use(auth.AuthnMiddleware(s.authenticator))
-	s.router.Use(contentTypeMiddleware)
-	s.router.Use(loggingMiddleware)
-	s.router.Use(errorHandlerMiddleware)
 }
 
 func adaptHandler(h func(handlers.ErrorResponseWriter, *http.Request)) http.HandlerFunc {

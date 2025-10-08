@@ -115,7 +115,7 @@ class KAgentCheckpointer(BaseCheckpointSaver[str]):
             raise ValueError("thread_id is required in config.configurable")
 
         user_id = configurable.get("user_id", "admin@kagent.dev")
-        checkpoint_ns = configurable.get("checkpoint_ns", "")
+        checkpoint_ns = configurable.get("checkpoint_ns", "kagent")
 
         return thread_id, user_id, checkpoint_ns
 
@@ -274,7 +274,7 @@ class KAgentCheckpointer(BaseCheckpointSaver[str]):
         """
         thread_id, user_id, checkpoint_ns = self._extract_config_values(config)
 
-        params = {"thread_id": thread_id, "checkpoint_ns": checkpoint_ns, "limit": "1"}
+        params = {"thread_id": thread_id, "checkpoint_ns": checkpoint_ns, "limit": "1", "user_id": user_id}
         if checkpoint_id := get_checkpoint_id(config):
             params["checkpoint_id"] = checkpoint_id
 
@@ -336,7 +336,7 @@ class KAgentCheckpointer(BaseCheckpointSaver[str]):
 
         response = await self.client.get(
             "/api/langgraph/checkpoints",
-            params={"thread_id": thread_id, "checkpoint_ns": checkpoint_ns, "limit": str(limit)},
+            params={"thread_id": thread_id, "checkpoint_ns": checkpoint_ns, "limit": str(limit), "user_id": user_id},
             headers={"X-User-ID": user_id},
         )
         response.raise_for_status()

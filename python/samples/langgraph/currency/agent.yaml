@@ -14,6 +14,11 @@ spec:
             secretKeyRef:
               name: kagent-google
               key: GOOGLE_API_KEY
+        - name: GOOGLE_API_BASE
+          valueFrom:
+            secretKeyRef:
+              name: kagent-google
+              key: GOOGLE_API_BASE
         # Enable OpenTelemetry tracing, make sure to set this according to your environment
         - name: OTEL_TRACING_ENABLED
           value: "true"
