@@ -157,6 +157,16 @@ class A2aAgentExecutor(AgentExecutor):
         # Convert the a2a request to ADK run args
         run_args = convert_a2a_request_to_adk_run_args(context)
 
+        # Set span attributes early, before any async operations that might create child spans
+        current_span = trace.get_current_span()
+        logger.debug(f"Setting span attributes - user_id: {run_args.get('user_id')}, task_id: {context.task_id}, session_id: {run_args.get('session_id')}")
+        if run_args["user_id"]:
+            current_span.set_attribute("kagent.user_id", run_args["user_id"])
+        if context.task_id:
+            current_span.set_attribute("gen_ai.task.id", context.task_id)
+        if run_args["session_id"]:
+            current_span.set_attribute("gen_ai.converstation.id", run_args["session_id"])
+
         # ensure the session exists
         session = await self._prepare_session(context, run_args, runner)
 
@@ -174,14 +184,6 @@ class A2aAgentExecutor(AgentExecutor):
         )
 
         await runner.session_service.append_event(session, system_event)
-
-        current_span = trace.get_current_span()
-        if run_args["user_id"]:
-            current_span.set_attribute("kagent.user_id", run_args["user_id"])
-        if context.task_id:
-            current_span.set_attribute("gen_ai.task.id", context.task_id)
-        if run_args["session_id"]:
-            current_span.set_attribute("gen_ai.converstation.id", run_args["session_id"])
 
         # create invocation context
         invocation_context = runner._new_invocation_context(
